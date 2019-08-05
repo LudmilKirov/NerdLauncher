@@ -1,6 +1,8 @@
 package com.example.nerdlauncher;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -73,7 +75,8 @@ class NerdLauncherFragment extends Fragment {
 
     //ViewHolder that displays an activity label.
     // Store the activity ResolveInfo in a member variable
-    private class ActivityHolder extends RecyclerView.ViewHolder {
+    private class ActivityHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
 
         private ResolveInfo mResolveInfo;
         private TextView mNameTextView;
@@ -81,6 +84,7 @@ class NerdLauncherFragment extends Fragment {
         public ActivityHolder(@NonNull View itemView) {
             super(itemView);
             mNameTextView = (TextView) itemView;
+            mNameTextView.setOnClickListener(this);
         }
 
         public void bindActivity(ResolveInfo resolveInfo) {
@@ -89,9 +93,26 @@ class NerdLauncherFragment extends Fragment {
             String appName = mResolveInfo.loadLabel(pm).toString();
             mNameTextView.setText(appName);
         }
+
+        //When an activity in the list is pressed use the
+        // ActivityInfo for that activity to create an
+        // explicit intent.Then use that explicit intent
+        // to launch the selected activity
+        @Override
+        public void onClick(View view) {
+            ActivityInfo activityInfo = mResolveInfo.activityInfo;
+
+            Intent i = new Intent(Intent.ACTION_MAIN)
+                    .setClassName(activityInfo.applicationInfo.packageName,
+                            activityInfo.name)
+                    //To start the app on its own
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            startActivity(i);
+        }
     }
 
-    private  class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder>{
+    private class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
 
         private final List<ResolveInfo> mActivities;
 
@@ -104,7 +125,7 @@ class NerdLauncherFragment extends Fragment {
         public ActivityHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
             View view = layoutInflater
-                    .inflate(R.layout.support_simple_spinner_dropdown_item, parent,false);
+                    .inflate(R.layout.support_simple_spinner_dropdown_item, parent, false);
 
             return new ActivityHolder(view);
         }
