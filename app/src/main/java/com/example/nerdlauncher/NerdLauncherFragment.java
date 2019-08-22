@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,13 +28,12 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 class NerdLauncherFragment extends Fragment {
     private static final String TAG = "NerdLauncherFragment";
-    private RecyclerView mRecyclerView;
 
+    private RecyclerView mRecyclerView;
 
     public static NerdLauncherFragment newInstance() {
         return new NerdLauncherFragment();
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -43,9 +44,9 @@ class NerdLauncherFragment extends Fragment {
                 container, false);
         mRecyclerView = v.findViewById(R.id.fragmetn_nerd_launcher_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         setupAdapter();
         return v;
-
     }
 
     private void setupAdapter() {
@@ -80,18 +81,24 @@ class NerdLauncherFragment extends Fragment {
 
         private ResolveInfo mResolveInfo;
         private TextView mNameTextView;
+        private ImageView mIconImageView;
 
         public ActivityHolder(@NonNull View itemView) {
             super(itemView);
             mNameTextView = (TextView) itemView;
+            mIconImageView = (ImageView) itemView;
             mNameTextView.setOnClickListener(this);
         }
 
         public void bindActivity(ResolveInfo resolveInfo) {
             mResolveInfo = resolveInfo;
-            PackageManager pm = getActivity().getPackageManager();
+            PackageManager pm = itemView.getContext().getPackageManager();
+
             String appName = mResolveInfo.loadLabel(pm).toString();
             mNameTextView.setText(appName);
+
+            Drawable appIcon = mResolveInfo.loadIcon(pm);
+            mIconImageView.setImageDrawable(appIcon);
         }
 
         //When an activity in the list is pressed use the
@@ -113,13 +120,11 @@ class NerdLauncherFragment extends Fragment {
     }
 
     private class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
-
         private final List<ResolveInfo> mActivities;
 
         private ActivityAdapter(List<ResolveInfo> activities) {
             mActivities = activities;
         }
-
         @NonNull
         @Override
         public ActivityHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -132,7 +137,6 @@ class NerdLauncherFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull ActivityHolder activityHolder, int position) {
-
             ResolveInfo resolveInfo = mActivities.get(position);
             activityHolder.bindActivity(resolveInfo);
         }

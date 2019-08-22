@@ -9,6 +9,6 @@ public class MainActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment() {
-       return  NerdLauncherFragment.newInstance();
+        return NerdLauncherFragment.newInstance();
     }
 }
