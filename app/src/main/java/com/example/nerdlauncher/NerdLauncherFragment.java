@@ -45,7 +45,6 @@ class NerdLauncherFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setupAdapter();
         return v;
-
     }
 
     private void setupAdapter() {
